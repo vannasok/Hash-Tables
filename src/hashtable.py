@@ -66,15 +66,16 @@ class HashTable:
             while node:
                 if node.key == key:
                     # replace the value if key already exist
-                    # print('overwrite value')
+
                     node.value = value
+                    print('overwrite value')
                     break
                 elif node.next:
                     # check next node
-                    # print('overwrite value')
+
                     node = node.next
                 else:
-                    print('overwrite value')
+
                     node.next = LinkedPair(key, value)
                     break
         else:
