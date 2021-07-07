@@ -9,6 +9,9 @@ class LinkedPair:
         self.value = value
         self.next = None
 
+    def __repr__(self):
+        return f"<{self.key}, {self.value}>"
+
 
 class HashTable:
     '''
@@ -23,7 +26,7 @@ class HashTable:
     def _hash(self, key):
         '''
         Hash an arbitrary key and return an integer.
-
+​
         You may replace the Python hash with DJB2 as a stretch goal.
         '''
         return hash(key)
@@ -31,15 +34,10 @@ class HashTable:
     def _hash_djb2(self, key):
         '''
         Hash an arbitrary key using DJB2 hash
-
+​
         OPTIONAL STRETCH: Research and implement DJB2
         '''
-        # Start from an arbitrary large prime
-        hash_value = 5381
-        # Bit-shift and sum value for each character
-        for char in key:
-            hash_value = ((hash_value << 5) + hash_value) + char
-        return hash_value
+        pass
 
     def _hash_mod(self, key):
         '''
@@ -51,86 +49,71 @@ class HashTable:
     def insert(self, key, value):
         '''
         Store the value with the given key.
-
+​
         # Part 1: Hash collisions should be handled with an error warning. (Think about and
         # investigate the impact this will have on the tests)
-
+​
         # Part 2: Change this so that hash collisions are handled with Linked List Chaining.
-
+​
         Fill this in.
         '''
-        hashed_key = self._hash_mod(key)
-
-        if self.storage[hashed_key] != None:
-            node = self.storage[hashed_key]
-            while node:
-                if node.key == key:
-                    # replace the value if key already exist
-
-                    node.value = value
-                    print('overwrite value')
-                    break
-                elif node.next:
-                    # check next node
-
-                    node = node.next
-                else:
-
-                    node.next = LinkedPair(key, value)
-                    break
+        # Hashmod the key to find the bucket
+        index = self._hash_mod(key)
+       # Check if a pair already exists in the bucket
+        pair = self.storage[index]
+        if pair is not None:
+            # If so, overwrite the key/value and throw a warning
+            if pair.key != key:
+                print("Warning: Overwriting value")
+                pair.key = key
+            pair.value = value
         else:
-            self.storage[hashed_key] = LinkedPair(key, value)
+            # If not, Create a new LinkedPair and place it in the bucket
+            self.storage[index] = LinkedPair(key, value)
 
     def remove(self, key):
         '''
         Remove the value stored with the given key.
-
+​
         Print a warning if the key is not found.
-
+​
         Fill this in.
         '''
-        hashed_key = self._hash_mod(key)
-        current = self.storage[hashed_key]
-        last = None
-
-        while (current != None and current.key != key):
-            last = current
-            current = current.next
-
-        if (self.storage[hashed_key] == None):
-            print("Can't find key")
+        index = self._hash_mod(key)
+        # Check if a pair exists in the bucket with matching keys
+        if self.storage[index] is not None and self.storage[index].key == key:
+            # If so, remove that pair
+            self.storage[index] = None
         else:
-            if (last != None):
-                last.next = current.next
-            else:
-                self.storage[hashed_key] = current.next
+            # Else print warning
+            print("Warning: Key does not exist")
 
     def retrieve(self, key):
         '''
         Retrieve the value stored with the given key.
-
+​
         Returns None if the key is not found.
-
+​
         Fill this in.
         '''
-        hashed_key = self._hash_mod(key)
-        current = self.storage[hashed_key]
+        # Get the index from hashmod
+        index = self._hash_mod(key)
 
-        while current != None and current.key != key:
-            current = current.next
-
-        if current != None:
-            return current.value
+        # Check if a pair exists in the bucket with matching keys
+        if self.storage[index] is not None and self.storage[index].key == key:
+            # If so, return the value
+            return self.storage[index].value
         else:
+            # Else return None
             return None
 
     def resize(self):
         '''
-        Doubles the capacity of the hash table and
-        rehash all key/value pairs.
-
-        Fill this in.
-        '''
+            Doubles the capacity of the hash table and
+            rehash all key/value pairs.
+    ​
+            Fill this in.
+            '''
         temp_storage = self.storage
         self.capacity *= 2
         self.storage = [None] * self.capacity
